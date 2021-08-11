@@ -23,6 +23,37 @@ namespace CDBBank.Controllers
             return View();
         }
 
+        public IActionResult Offer1()
+        {
+            return View();
+        }
+
+        public IActionResult Offer2()
+        {
+            return View();
+        }
+
+        public IActionResult Offer3()
+        {
+            return View();
+        }
+
+        public IActionResult RD()
+        {
+            return View();
+        }
+
+        public IActionResult FD()
+        {
+            return View();
+        }
+
+        public IActionResult SIP()
+        {
+            return View();
+        }
+
+
         public IActionResult Privacy()
         {
             return View();

@@ -24,10 +24,10 @@ namespace CDBBank.Controllers
         {
             _context = context;
         }
-        public async Task<IActionResult> Dashboard()
+        public IActionResult Dashboard()
         {
             int id = Convert.ToInt32(HttpContext.Session.GetInt32("UserId"));
-            return View(await _context.Transactions.Where(u => u.Id == id).OrderByDescending(u => u.TransactionDate).Take(7).ToListAsync());
+            return View(_context.Transactions.Where(u => u.Id == id).OrderByDescending(u => u.TransactionDate).Take(7));
         }
 
         public ActionResult Settings()

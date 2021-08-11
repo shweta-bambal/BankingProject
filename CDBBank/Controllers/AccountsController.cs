@@ -149,41 +149,7 @@ namespace CDBBank.Controllers
                 return _context.BankUsers.Any(e => e.Id == id);
             }
 
-
-
-
-            public IActionResult CreateNew()
-            {
-                return View();
-            }
-
-            // POST: AccountUsers/Create
-            // To protect from overposting attacks, enable the specific properties you want to bind to.
-            // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-            [HttpPost]
-            [ValidateAntiForgeryToken]
-            public async Task<IActionResult> CreateNew([Bind("Id,Username,AccountNum,FirstName,LastName,Email,Mobile,Password,ConfirmPassword,Balance,Country,AccountType,PinCode,Sques,SAns,DoB")] BankUser accountUser)
-            {
-                if (ModelState.IsValid)
-                {
-                    _context.Add(accountUser);
-                    Random r = new Random();
-                    int n = r.Next(0000, 9999);
-                    accountUser.AccountNum = "CDB00DF" + n.ToString();
-                    HttpContext.Session.SetString("AccNumber", accountUser.AccountNum);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction("SuccessNew");
-                }
-                return View(accountUser);
-            }
-
-
-            public IActionResult SuccessNew()
-            {
-                ViewBag.AccNum = HttpContext.Session.GetString("AccNumber");
-                ViewBag.Id = HttpContext.Session.GetInt32("UserId");
-                return View();
-            }
+          
 
         }
     }

@@ -188,3 +188,5 @@ C:\Users\912236\source\repos\CDBBank\CDBBank\obj\Debug\net5.0\Razor\Views\Home\S
 C:\Users\912236\source\repos\CDBBank\CDBBank\obj\Debug\net5.0\Razor\Views\Users\Settings.cshtml.g.cs
 C:\Users\912236\source\repos\CDBBank\CDBBank\obj\Debug\net5.0\Razor\Views\Users\SuccessPopup.cshtml.g.cs
 C:\Users\912236\source\repos\CDBBank\CDBBank\obj\Debug\net5.0\Razor\Views\Users\Offers.cshtml.g.cs
+C:\Users\912236\source\repos\CDBBank\CDBBank\obj\Debug\net5.0\Razor\Views\BankUsers\CreateNew.cshtml.g.cs
+C:\Users\912236\source\repos\CDBBank\CDBBank\obj\Debug\net5.0\Razor\Views\BankUsers\SuccessNew.cshtml.g.cs
