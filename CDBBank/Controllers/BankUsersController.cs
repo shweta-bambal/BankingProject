@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CDBBank.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CDBBank.Controllers
 {
@@ -43,7 +44,7 @@ namespace CDBBank.Controllers
             return View(bankUser);
         }
 
-
+       
         public IActionResult CreateNew()
         {
             return View();
@@ -52,6 +53,7 @@ namespace CDBBank.Controllers
         // POST: AccountUsers/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateNew([Bind("Id,Username,AccountNum,FirstName,LastName,Email,Mobile,Password,ConfirmPassword,Balance,Country,AccountType,PinCode,Sques,SAns,DoB")] BankUser accountUser)

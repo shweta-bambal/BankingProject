@@ -1,29 +1,54 @@
 ﻿using CDBBank.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Web;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using CDBBank.Models.Repositories;
 
 namespace CDBBank.Controllers
 {
     public class DefaultController : Controller
     {
         private readonly CDBBankContext _context;
+       
+        private readonly IConfiguration _config;
+        private readonly IUserRepository _userRepository;
+        private readonly ITokenService _tokenService;
+        private string generatedToken = null;
 
-        public DefaultController(CDBBankContext context)
+
+        public DefaultController(CDBBankContext context, IConfiguration configuration, IUserRepository userRepository, ITokenService tokenService)
         {
+            _config = configuration;
             _context = context;
+            _userRepository = userRepository;
+            _tokenService = tokenService;
         }
+
+
+
+        //static string apiurl = "https://localhost:44395/authentication";
+        //BankUser user = new BankUser();
+        //HttpClient client = new HttpClient();
+
         public IActionResult Index()
         {
             return View();
         }
 
+      
         public IActionResult IsCustomer()
         {
+           
             if (HttpContext.Session.GetString("UserName") != null && HttpContext.Session.GetString("Password") != null)
             {
                 return RedirectToAction("Dashboard", "Users");
@@ -31,34 +56,64 @@ namespace CDBBank.Controllers
             return View();
         }
 
+        [AllowAnonymous]
+        //[Route("login")]
         [HttpPost]
-        public async Task<IActionResult> IsCustomer(BankUser u)
+        public ActionResult AuthorizeUser(BankUser userModel)
         {
-            var obj = await _context.BankUsers.Where(a => a.Username.Equals(u.Username)).FirstOrDefaultAsync();
-            if (obj != null && obj.Username == u.Username && obj.Password == u.Password)
+            var obj =_context.BankUsers.Where(a => a.Username.Equals(userModel.Username)).FirstOrDefault();
+            if (obj.Password == userModel.Password)
             {
-                HttpContext.Session.SetInt32("UserId", obj.Id);
-                HttpContext.Session.SetString("UserName", obj.Username.ToString());
-                HttpContext.Session.SetString("Fname", obj.FirstName.ToString());
+                generatedToken = _tokenService.BuildToken(_config["Authentication:AccessTokenKey"].ToString(), _config["Authentication:Issuer"].ToString(), obj);
+                if (generatedToken != null)
+                {
+                    HttpContext.Session.SetString("Token", generatedToken);
+                    HttpContext.Session.SetInt32("UserId", obj.Id);
+                    HttpContext.Session.SetString("UserName", obj.Username.ToString());
+                    HttpContext.Session.SetString("Fname", obj.FirstName.ToString());
 
-                HttpContext.Session.SetString("Balance", obj.Balance.ToString());
-                HttpContext.Session.SetString("AccType", obj.AccountType.ToString());
+                    HttpContext.Session.SetString("Balance", obj.Balance.ToString());
+                    HttpContext.Session.SetString("AccType", obj.AccountType.ToString());
 
-                return RedirectToAction("Dashboard", "Users");
+                    return RedirectToAction("AuthorizationSuccess");
+                }
+                else
+                {
+                    return (RedirectToAction("Error"));
+                }
             }
             else
             {
-                ModelState.AddModelError("", "Credentials are not matched");
+                return (RedirectToAction("Error"));
             }
-            return View();
         }
 
-        public ActionResult Services()
+        [Authorize]
+        [HttpGet]
+        public IActionResult AuthorizationSuccess()
         {
-            ViewBag.Id = HttpContext.Session.GetInt32("UserId");
-            ViewBag.Uname = HttpContext.Session.GetString("UserName");
-            return View();
+
+            string token = HttpContext.Session.GetString("Token");
+            if (token == null)
+            {
+                return (RedirectToAction("IsCustomer"));
+            }
+            if (!_tokenService.ValidateToken(_config["Authentication:AccessTokenKey"].ToString(), _config["Authentication:Issuer"].ToString(), token))
+            {
+                return (RedirectToAction("IsCustomer"));
+            }
+
+            ViewBag.token = token;
+            return RedirectToAction("Dashboard", "Users");
+          //  return RedirectToAction("Dashboard", "Users");
         }
+
+        //public ActionResult Services()
+        //{
+        //    ViewBag.Id = HttpContext.Session.GetInt32("UserId");
+        //    ViewBag.Uname = HttpContext.Session.GetString("UserName");
+        //    return View();
+        //}
 
 
 
@@ -87,4 +142,7 @@ namespace CDBBank.Controllers
             return View();
         }
     }
+
+   
+    
 }
